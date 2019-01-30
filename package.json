@@ -1,0 +1,13 @@
+{
+  "name": "auto-registro-de-horas",
+  "description": "Pequeño script que utiliza Puppeteer para comenzar el registro de horas en el FLOW System de FSW.",
+  "version": "0.1",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "node-notifier": "^5.3.0",
+    "puppeteer": "^1.11.0"
+  },
+  "scripts": {
+    "demo": "node notificationTest.js"
+  }
+}

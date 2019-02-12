@@ -1,13 +1,22 @@
 {
+  "private": true,
   "name": "auto-registro-de-horas",
   "description": "Pequeño script que utiliza Puppeteer para comenzar el registro de horas en el FLOW System de FSW.",
-  "version": "0.1",
+  "version": "0.1.0",
+  "author": "iksaku",
   "license": "GPL-3.0",
+  "main": "main.js",
   "dependencies": {
     "node-notifier": "^5.3.0",
     "puppeteer": "^1.11.0"
   },
   "scripts": {
-    "demo": "node notificationTest.js"
+    "dev": "yarn run development",
+    "development": "cross-env NODE_ENV=development node main.js",
+    "prod": "yarn run production",
+    "production": "cross-env NODE_ENV=production node main.js"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0"
   }
 }

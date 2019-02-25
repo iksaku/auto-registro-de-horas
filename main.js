@@ -22,6 +22,16 @@ switch(process.env.NODE_ENV) {
         break;
 }
 
+if (process.argv[2] === undefined) {
+    console.log('Please specify if you want to either login or logout: main.js <login|logout>');
+    process.exit(1);
+} else if (process.argv[2] !== 'login' && process.argv[2] !== 'logout') {
+    console.log('Unknown command \'' + process.argv[2] + '\'');
+    process.exit(2);
+}
+
+doLogin = process.argv[2] === 'login';
+
 (async () => {
     const browser = await puppeteer.launch(options);
 
@@ -43,26 +53,49 @@ switch(process.env.NODE_ENV) {
     await page.waitFor('.bootbox');
 
     const hasRegistered = (await page.$x('//div[contains(text(), "SALIDA")]')).length > 0;
-    let message = "Ya has iniciado tu conteo de horas...";
+    let message = '';
 
-    if (!hasRegistered) {
-        await page.evaluate(() => {
-            document.querySelector('button[data-bb-handler="main"]').click();
-        });
+    if (doLogin) {
+        if (!hasRegistered) {
+            await page.evaluate(() => {
+                document.querySelector('button[data-bb-handler="main"]').click();
+            });
 
-        await page.waitFor('button[data-bb-handler="ok"]');
+            await page.waitFor('button[data-bb-handler="ok"]');
 
-        await page.evaluate(() => {
-            document.querySelector('button[data-bb-handler="ok"]').click();
-        });
+            /*await page.evaluate(() => {
+                document.querySelector('button[data-bb-handler="ok"]').click();
+            });*/
+        }
 
         message = '¡Ha sido iniciado tu conteo de horas!'
+    } else {
+        if (hasRegistered) {
+            await page.evaluate(() => {
+                document.querySelector('button[data-bb-handler="main"]').click();
+            });
+
+            await page.waitFor('button[data-bb-handler="ok"]');
+
+            /*await page.evaluate(() => {
+                document.querySelector('button[data-bb-handler="ok"]').click();
+            });*/
+        }
+
+        message = '¡Has registrado salida!';
+    }
+
+    let actionStatus = (await page.$x('//div[contains(text(), "correctamente")]')).length > 0;
+    if (!actionStatus) {
+        message = '[Error] No ha sido posible registrar ' + (doLogin ? 'entrada' : 'salida') + '.';
     }
 
     browser.close();
 
-    notifier.notify({
-        title: 'Auto-Registro de Horas',
-        message
-    });
+    if (process.env.ALLOW_NOTIFICATIONS) {
+        notifier.notify({
+            title: 'Auto-Registro de Horas',
+            message
+        });
+    }
 })();
